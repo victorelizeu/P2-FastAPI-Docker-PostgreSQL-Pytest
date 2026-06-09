@@ -1,0 +1,41 @@
+services:
+  postgresdb:
+    image: postgres:17-alpine
+
+    restart: always
+
+    container_name: jonesdb
+
+    ports:
+      - "5433:5432"
+
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: postdb
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    environment:
+      DB_USER: admin
+      DB_PASSWORD: admin123
+      DB_HOST: postgresdb
+      DB_PORT: 5432
+      DB_NAME: postdb
+    
+    depends_on: 
+      - postgresdb
+
+    container_name: fastapi
+
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
